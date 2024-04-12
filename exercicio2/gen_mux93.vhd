@@ -1,6 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.math_real."log2";
+--use ieee.math_real.all;
 
 package mux_input_array is
     type input_arr is array (natural range <>, natural range <>) of std_logic;
@@ -31,9 +31,9 @@ begin
     report "gen_mux INPUTS must be greater than 1."
     severity failure;
     
-    assert log2(real(INPUTS)) mod 1 = 0
-    report "gen_mux INPUTS  must be power of 2."
-    severity failure;
+--    assert 2**integer(ceil(log2(real(INPUTS)))) = INPUTS
+--    report "gen_mux INPUTS  must be power of 2."
+--    severity failure;
 
 end entity gen_mux;
 
@@ -41,6 +41,6 @@ architecture imp of gen_mux is
 begin
     gen: for n_bit in integer range 0 to BUS_SIZE-1 generate
     begin
-        y <= i(sel);
+        y(n_bit) <= i(sel, n_bit);
     end generate;
 end architecture;
