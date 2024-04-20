@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.math_real."log2";
 
 package mux_input_array is
     type input_arr is array (natural range <>, natural range <>) of std_logic;
@@ -22,7 +23,17 @@ entity gen_mux is
     
 begin 
 
-    --asserts
+    assert BUS_SIZE >= 1
+    report "BUS_SIZE must be greater than 0."
+    severity failure;
+
+    assert INPUTS > 1
+    report "gen_mux INPUTS must be greater than 1."
+    severity failure;
+    
+    assert log2(real(INPUTS)) mod 1 = 0
+    report "gen_mux INPUTS  must be power of 2."
+    severity failure;
 
 end entity gen_mux;
 
