@@ -1,0 +1,9 @@
+'x', 'w', 'z' | 'y'
+'0', '0', '0' | '1' -- Time since change: 15000 ps
+'0', '0', '1' | '0' -- Time since change: 15000 ps
+'0', '1', '0' | '0' -- Time since change: 55000 ps
+'0', '1', '1' | '0' -- Time since change: 95000 ps
+'1', '0', '0' | '0' -- Time since change: 135000 ps
+'1', '0', '1' | '0' -- Time since change: 175000 ps
+'1', '1', '0' | '0' -- Time since change: 215000 ps
+'1', '1', '1' | '0' -- Time since change: 255000 ps
