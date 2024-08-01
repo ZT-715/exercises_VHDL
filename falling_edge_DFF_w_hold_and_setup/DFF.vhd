@@ -1,14 +1,14 @@
-/* 
- * De acordo com a tarefa selecionada, proponha um modelo VHDL e um
- * testbench adequado para o problema indicado (o testbench deve ser
- * capaz de verificar as condições de temporização indicadas):
- *
- * Tarefa B: proponha um modelo comportamental para um flip-flop
- * tipo D sensível a borda de descida, com as seguintes restrições
- * temporais de operação: setup de 3ns, hold de 2ns e largura
- * mínima do pulso de clock de 5ns.
- *
- */
+--  
+--  De acordo com a tarefa selecionada, proponha um modelo VHDL e um
+--  testbench adequado para o problema indicado (o testbench deve ser
+--  capaz de verificar as condições de temporização indicadas):
+-- 
+--  Tarefa B: proponha um modelo comportamental para um flip-flop
+--  tipo D sensível a borda de descida, com as seguintes restrições
+--  temporais de operação: setup de 3ns, hold de 2ns e largura
+--  mínima do pulso de clock de 5ns.
+-- 
+-- 
  
 package DFF_delays is
     constant SETUP: time := 3 ns;
@@ -28,60 +28,56 @@ entity DFF is
 
     port(clk, rst, d : in std_logic;
          q : out std_logic);
-     
+
 end entity;
 
-
 architecture falling_edge_DFF_w_hold_and_setup of DFF is
+    signal hold_on: bit := '0';
+    signal clock_check: bit := '1';
 begin
-
-    DFF: process
-    variable result : std_logic := '0';
+   
+    DFF: process(rst, clk, d)
+    variable last_clock_event: time := 0 ns;
     begin
-       
         if (rst = '1') then
-            q <= '0';
-        elsif (falling_edge(clk)) then 
-            q <= d; 
-            
-            if (d'last_event < SETUP) then
-                q <= 'U';
-            end if;
-            
-            wait until d'event for HOLD;
-            
-            if (d /= q) then
-                q <= 'U';
-            end if;
-            
-        end if;
-        
-            
-    end process DFF;
-    
-    ASSERTS: process
-    begin
-    if (falling_edge(clk) and rst /= '1') then
-            
-            assert clk'last_event >= MIN_CLK_PULSE/2
-                report "Clock frequency above maximum threshold."
-                severity ERROR;
-    
-            -- Sinal deve ser estável por SETUP antes de falling_edge
-            -- e NÃO pode oscilar por HOLD depois do falling_edge.
-            assert d'last_event >= SETUP
-                report "SETUP time not respected."
-                severity ERROR;
+            q <= '1';
+        else
+
+            if (falling_edge(clk)) then 
+                q <= d; 
                 
-            wait for HOLD;
+                if (d'last_event < SETUP) then
+                    report "Input last_event " & time'image(d'last_event) & " < SETUP time.";
+                    q <= 'U';
+                end if;
+                
+                if ((now - last_clock_event) < MIN_CLK_PULSE) then
+                    report "Clock above maximum frequency.";
+                    q <= 'U';
+                end if;
+                
+                last_clock_event := now;
+            --- end if;
             
-            assert d'last_event >= HOLD + SETUP
-                report "HOLD time not respected."
-                severity ERROR;
-            
-    end if;
-    end process ASSERTS;
-    
+            elsif (d'event and hold_on = '1') then
+                report "Input event " & time'image(now) & " on HOLD time.";
+                q <= 'U';
+            end if;
+
+        end if;
+
+        
+    end process DFF;
+
+    HOLDING: process
+    begin
+    wait until clk'event and clk = '0';    
+        
+        hold_on <= '1', '0' after HOLD;
+       
+    wait for 0 ns;
+    end process HOLDING; 
+
 end architecture;
 
 
