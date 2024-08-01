@@ -48,12 +48,12 @@ begin
                 
                 if (d'last_event < SETUP) then
                     report "Input last_event " & time'image(d'last_event) & " < SETUP time.";
-                    q <= 'U';
+                    q <= 'X';
                 end if;
                 
                 if ((now - last_clock_event) < MIN_CLK_PULSE) then
                     report "Clock above maximum frequency.";
-                    q <= 'U';
+                    q <= 'X';
                 end if;
                 
                 last_clock_event := now;
@@ -61,7 +61,7 @@ begin
             
             elsif (d'event and hold_on = '1') then
                 report "Input event " & time'image(now) & " on HOLD time.";
-                q <= 'U';
+                q <= 'X';
             end if;
 
         end if;
